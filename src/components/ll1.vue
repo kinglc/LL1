@@ -138,7 +138,7 @@
                 let ri = this.grammars[i].right[j].indexOf(this.left[index]) + aim;
                 if (ri === -1) continue;
                 if (ri > this.grammars[i].right[j].length - 1) {//为最末位
-                  if(this.follow[i].length)
+                  // if(this.follow[i].length)
                   if (this.follow[i].length === 0) {//未follow
                     follow = follow.concat(this.getFollow(i));
                   } else {//已follow
