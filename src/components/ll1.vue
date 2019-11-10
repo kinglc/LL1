@@ -3,7 +3,7 @@
   <div id="title" class="center">LL(1)分析表的求取</div>
   <div v-if="isIn" class="content">
       <div class="center">
-        <div class="input">
+        <div id="input">
           <el-input type="textarea"
                     :autosize="{ minRows: 14, maxRows: 17}"
                     resize="none"
@@ -14,7 +14,18 @@
       </div>
   </div>
   <div v-else class="content">
-    <div></div>
+    <el-table
+      :data="grammars">
+      <div v-for="item in right">
+      <el-table-column
+        prop="item"
+        label="item"
+        width="180"
+        column-key="date"
+      >
+      </el-table-column>
+      </div>
+    </el-table>
   </div>
   <el-button type="primary" class="center" @click="turnIn">{{textIn}}</el-button>
 </div>
@@ -40,7 +51,12 @@
         },
 
       mounted(){
-          // this.turnIn();
+          this.input='E->Te\n' +
+        'e->+Te|ε\n' +
+        'T->Ft\n' +
+        't->*Ft|ε\n' +
+        'F->(E)|i\n';
+          this.turnIn();
       },
 //ε
         methods:{
@@ -132,6 +148,7 @@
 
           getFollow:function(index) {
             let follow = [],aim = 0,len = -1;
+            // console.log(this.left[index]);
             for (let i = 0; i < this.grammars.length; i++) {
               if (i === index) continue;
               for (let j = 0; j < this.grammars[i].right.length; j++) {
@@ -140,7 +157,7 @@
                 if(ri > this.grammars[i].right[j].length - 1){
                   follow = follow.concat(this.follow[i]);
                 }else if (ri === this.grammars[i].right[j].length - 1) {//为最末位
-                  if (this.follow[i].length === 0) {//未follow
+                  if (this.follow[i].length === 0||index===0) {//未follow
                     follow = follow.concat(this.getFollow(i));
                   } else {//已follow
                     follow = follow.concat(this.follow[i]);
@@ -155,6 +172,8 @@
                   }
                 }
 
+                // console.log(follow);
+
                 let blank = follow.lastIndexOf('ε');
                 if (blank > len) {//存在空
                   follow.splice(blank, 1);
@@ -166,16 +185,16 @@
                 len = follow.length;
               }
             }
-            this.follow[index] = follow;
+            this.follow[index] = this.follow[index].concat(follow);
             return follow;
           },
 
           setFollow:function () {
             this.follow[0]=['#'];
-            console.log(this.grammars[0].left+'->'+this.follow[0]);
-            for(let i=1;i<this.grammars.length;i++){
-              if(this.follow[i].length===0)
+            for(let i=0;i<this.grammars.length;i++){
+              if(this.follow[i].length===0||i===0){
                 this.getFollow(i);
+              }
               this.follow[i] = Array.from(new Set(this.follow[i]));
               console.log(this.grammars[i].left+'->'+this.follow[i]);
             }
