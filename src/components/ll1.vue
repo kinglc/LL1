@@ -15,14 +15,13 @@
   </div>
   <div v-else class="content">
     <el-table
-      :data="grammars">
+      :data="tableData">
       <div v-for="item in right">
       <el-table-column
-        prop="item"
-        label="item"
-        width="180"
-        column-key="date"
+        :prop="prop"
+        :label="item"
       >
+        {{grammars[i]}}
       </el-table-column>
       </div>
     </el-table>
@@ -45,8 +44,7 @@
             right:[],
             first:[],
             follow:[],
-
-
+            tableData:[],
           }
         },
 
@@ -82,12 +80,13 @@
 
           getStr:function(){
             let ss = this.input.split('\n');
+            let right=[];
             for(let i = 0;i<ss.length;i++){
               if(ss[i].length>0){
                 let g = ss[i].split("->");
                 let r = g[1].split('|');
                 this.left.push(g[0]);
-                this.right.push(g[1]);
+                right.push(g[1]);
                 let grammar = {
                   left:g[0],
                   right:r,
@@ -96,18 +95,24 @@
               }
             }
             //剔除重复及|
-            this.right = Array.from(new Set(this.right.join('').split('')));
-            if(this.right.indexOf('|')!==-1) {
-              this.right.splice(this.right.indexOf('|'), 1);
+            right = Array.from(new Set(this.right.join('').split('')));
+            if(right.indexOf('|')!==-1) {
+              right.splice(this.right.indexOf('|'), 1);
             }
             //剔除非终结符,初始化first和follow
             for(let i=0;i<this.left.length;i++) {
               this.first[i] = [];
               this.follow[i] = [];
-              if (this.right.indexOf(this.left[i]) !== -1) {
-                this.right.splice(this.right.indexOf(this.left[i]), 1);
+              if (right.indexOf(this.left[i]) !== -1) {
+                right.splice(this.right.indexOf(this.left[i]), 1);
               }
             }
+
+            right.unshift("G","First","Follow");
+            // for(let i=0;i<right.length;i++){
+            //   let obj={};
+            //
+            // }
           },
 
           getFirst:function(index){
@@ -202,7 +207,38 @@
           },
 
           setTable:function () {
-
+            for(let i = 0;i<this.left.length;i++){
+              let tmp = [this.left[i],this.first[i],this.follow[i]];
+              for(let j = 3;j<this.right.length;j++){
+                tmp[j]="";
+              }
+              for(let j = 0;j<this.first[i].length;j++){
+                if(this.first[j]==='ε'){
+                  for(let k = 3; k < this.right.length; k++){
+                    if(this.follow[i].indexOf(this.right[k])!==-1){
+                      tmp[k].concat(this.left[i]+"->ε\n");
+                    }
+                  }
+                }else {
+                  for (let k = 0; k < this.grammars[i].right.length; k++) {
+                    if (this.grammars[i].right[k].indexOf(this.first[j]) !== -1) {
+                      tmp[k].concat(this.left[i] + "->" + this.grammars[i].right[k] + "\n");
+                    }
+                  }
+                }
+              }
+              let obj={};
+              for(let j = 0;j<this.right.length;j++){
+                console.log(this.right[j]);
+                Object.defineProperty(obj,this.right[j],{
+                  value:tmp[j],
+                  writable:true,
+                });
+                console.log(this.right[j]);
+              }
+              this.tableData.push(obj);
+            }
+            console.log(this.tableData);
           },
 
         }
