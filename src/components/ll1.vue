@@ -42,8 +42,8 @@
         textIn:"查看结果",
 
         grammars:[],//文法，每个item包括left与right
-        left:[],//left的集合
-        right:[],//right的集合，每个item包括val：值 和 prop：属性名
+        left:[],//非终结符集合
+        right:[],//终结符集合，每个item包括val：值 和 prop：属性名
         up:[],//表头
         first:[],//first集
         follow:[],//follow集
