@@ -112,7 +112,9 @@
           }
         }
 
-        right.splice(right.indexOf("ε"),1);
+        if(right.indexOf("ε")!==-1) {
+          right.splice(right.indexOf("ε"), 1);
+        }
         right.sort();
         right.unshift("G","First","Follow");
         right.push("#");
